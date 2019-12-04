@@ -31,7 +31,7 @@
 	require_once "resources/check_auth.php";
 
 //permissions
-	if (permission_exists('exec_view')) {
+	if (permission_exists('command_view')) {
 		//access granted
 	}
 	else {
@@ -73,11 +73,6 @@
 //show the header
 	require_once "resources/header.php";
 	$document['title'] = $text['title-command'];
-
-//pdo database connection
-	if (permission_exists('exec_sql')) {
-		require_once "sql_query_pdo.php";
-	}
 
 //scripts and styles
 	?>
@@ -139,7 +134,7 @@
 						$('#response').show();
 						break;
 				<?php } ?>
-				<?php if (permission_exists('exec_php')) { ?>
+				<?php if (permission_exists('command_php')) { ?>
 					case 'php':
 						document.getElementById('description').innerHTML = "<?php echo $text['description-php'];?>";
 						editor.getSession().setMode({path:'ace/mode/php', inline:true}); //highlight without opening tag
@@ -154,28 +149,12 @@
 						$('#response').show();
 						break;
 				<?php } ?>
-				<?php if (permission_exists('exec_command')) { ?>
+				<?php if (permission_exists('command_shell')) { ?>
 					case 'shell':
 						document.getElementById('description').innerHTML = "<?php echo $text['description-shell'];?>";
 						editor.getSession().setMode('ace/mode/text');
 						$('#mode option[value=text]').prop('selected',true);
-						<?php if (permission_exists('exec_sql')) { ?>
-							$('.sql_controls').hide();
-							document.getElementById('sql_type').selectedIndex = 0;
-							document.getElementById('table_name').selectedIndex = 0;
-							$('#iframe').prop('src','');
-							$('#sql_response').hide();
-						<?php } ?>
 						$('#response').show();
-						break;
-				<?php } ?>
-				<?php if (permission_exists('exec_sql')) { ?>
-					case 'sql':
-						document.getElementById('description').innerHTML = "<?php echo $text['description-sql'];?>";
-						editor.getSession().setMode('ace/mode/sql');
-						$('#mode option[value=sql]').prop('selected',true);
-						$('.sql_controls').show();
-						$('#response').hide();
 						break;
 				<?php } ?>
 				default:
@@ -188,10 +167,6 @@
 			editor.getSession().setValue('');
 			$('#command').val('');
 			$('#response').hide();
-			<?php if (permission_exists('exec_sql')) { ?>
-				$('#iframe').prop('src','');
-				$('#sql_response').hide();
-			<?php } ?>
 			focus_editor();
 		}
 	</script>
@@ -230,7 +205,7 @@
 	echo "<table cellpadding='0' cellspacing='0' border='0' width='100%'>";
 	echo "	<tr>";
 	echo "		<td valign='top' align='left' width='50%'>";
-	echo "			<b>".$text['label-execute']."</b>\n";
+	echo "			<b>".$text['label-command']."</b>\n";
 	echo "		</td>";
 	echo "		<td valign='top' align='right' nowrap='nowrap'>";
 
@@ -238,60 +213,25 @@
 	echo "				<img src=\"data:image/png;base64, ".$image_base64."\" /><input type='text' class='txt' style='width: 150px; margin-left: 15px;' name='code' id='code' value=''>\n";
 	echo "				&nbsp; &nbsp; &nbsp;\n";
 
-	if (permission_exists('exec_switch') || permission_exists('exec_php') || permission_exists('exec_command') || permission_exists('exec_sql')) {
+	if (permission_exists('command_switch') || permission_exists('command_php') || 
+permission_exists('command_shell')) {
 		echo "				<select name='handler' id='handler' class='formfld' style='width:100px;' onchange=\"handler=this.value;set_handler(this.value);\">\n";
-		if (permission_exists('exec_switch')) { echo "<option value='switch' ".(($handler == 'switch') ? "selected='selected'" : null).">".$text['label-switch']."</option>\n"; }
-		if (permission_exists('exec_php')) { echo "<option value='php' ".(($handler == 'php') ? "selected='selected'" : null).">".$text['label-php']."</option>\n"; }
-		if (permission_exists('exec_command')) { echo "<option value='shell' ".(($handler == 'shell') ? "selected='selected'" : null).">".$text['label-shell']."</option>\n"; }
-		if (permission_exists('exec_sql')) { echo "<option value='sql' ".(($handler == 'sql') ? "selected='selected'" : null).">".$text['label-sql']."</option>\n"; }
+		if (permission_exists('command_switch')) { echo "<option value='switch' ".(($handler == 
+'switch') ? "selected='selected'" : null).">".$text['label-switch']."</option>\n"; }
+		if (permission_exists('command_php')) { echo "<option value='php' ".(($handler == 'php') ? 
+"selected='selected'" : null).">".$text['label-php']."</option>\n"; }
+		if (permission_exists('command_shell')) { echo "<option value='shell' ".(($handler == 'shell') ? 
+"selected='selected'" : null).">".$text['label-shell']."</option>\n"; }
 		echo "				</select>\n";
 	}
 
-	//sql controls
-	if (permission_exists('exec_sql')) {
-		echo "				<span class='sql_controls' ".(($handler != 'sql') ? "style='display: none;'" : null).">";
-		//echo "					".$text['label-table']."<br />";
-		echo "					<select name='table_name' id='table_name' class='formfld'>\n";
-		echo "						<option value=''></option>\n";
-		switch ($db_type) {
-			case 'sqlite': $sql = "select name from sqlite_master where type='table' order by name;"; break;
-			case 'pgsql': $sql = "select table_name as name from information_schema.tables where table_schema='public' and table_type='BASE TABLE' order by table_name"; break;
-			case 'mysql': $sql = "show tables"; break;
-		}
-		$database = new database;
-		$result = $database->select($sql, null, 'all');
-		if (is_array($result) && @sizeof($result) != 0) {
-			foreach ($result as &$row) {
-				$row = array_values($row);
-				echo "					<option value='".escape($row[0])."'>".escape($row[0])."</option>\n";
-			}
-		}
-		unset($sql, $result, $row);
-		echo "					</select>\n";
-		//echo "					<br /><br />\n";
-		//echo "					".$text['label-result_type']."<br />";
-		echo "					<select name='sql_type' id='sql_type' class='formfld'>\n";
-		echo "						<option value=''>".$text['option-result_type_view']."</option>\n";
-		echo "						<option value='csv'>".$text['option-result_type_csv']."</option>\n";
-		echo "						<option value='inserts'>".$text['option-result_type_insert']."</option>\n";
-		echo "					</select>\n";
-		echo "				</span>";
-	}
 	echo "					<input type='button' class='btn' style='margin-top: 0px;' title=\"".$text['button-execute']." [Ctrl+Enter]\" value=\"    ".$text['button-execute']."    \" onclick=\"$('form#frm').submit();\">";
 	echo "					<input type='button' class='btn' style='margin-top: 0px;' title=\"\" value=\"    ".$text['button-reset']."    \" onclick=\"reset_editor();\">";
 
-	//if (permission_exists('exec_sql')) {
-	//	echo "			<span class='sql_controls' ".(($handler != 'sql') ? "style='display: none;'" : null).">";
-	//	//echo "				<input type='button' class='btn' alt='".$text['button-select_database']."' onclick=\"document.location.href='sql_query_db.php'\" value='".$text['button-select_database']."'>\n";
-	//	if (permission_exists('exec_sql_backup')) {
-	//		echo "			<input type='button' class='btn' alt='".$text['button-backup']."' onclick=\"document.location.href='sql_backup.php".((strlen($_REQUEST['id']) > 0) ? "?id=".$_REQUEST['id'] : null)."'\" value='".$text['button-backup']."'>\n";
-	//	}
-	//	echo "			</span>";
-	//}
 	echo "		</td>";
 	echo "	</tr>";
 	echo "	<tr><td colspan='2'>\n";
-	echo 			$text['description-execute']."\n";
+	echo 			$text['description-command']."\n";
 	echo "	</tr>\n";
 	echo "</table>";
 	echo "<br>";
@@ -337,7 +277,6 @@
 					$modes['lua'] = 'Lua';
 					$modes['text'] = 'Text';
 					$modes['xml'] = 'XML';
-					$modes['sql'] = 'SQL';
 					foreach ($modes as $value => $label) {
 						$selected = $value == $mode ? 'selected' : null;
 						echo "<option value='".$value."' ".$selected.">".escape($label)."</option>\n";
@@ -462,12 +401,12 @@
 			$result = '';
 			switch ($handler) {
 				case 'shell':
-					if (permission_exists('exec_command') && $command_authorized) {
+					if (permission_exists('command_shell') && $command_authorized) {
 						$result = shell_exec($command . " 2>&1");
 					}
 					break;
 				case 'php':
-					if (permission_exists('exec_php') && $command_authorized) {
+					if (permission_exists('command_php') && $command_authorized) {
 						ob_start();
 						eval($command);
 						$result = ob_get_contents();
@@ -475,7 +414,7 @@
 					}
 					break;
 				case 'switch':
-					if (permission_exists('exec_switch') && $command_authorized) {
+					if (permission_exists('command_switch') && $command_authorized) {
 						$fp = event_socket_create($_SESSION['event_socket_ip_address'], $_SESSION['event_socket_port'], $_SESSION['event_socket_password']);
 						if ($fp) { 
 							$result = event_socket_request($fp, 'api '.$command);
@@ -491,15 +430,6 @@
 				echo "</span>";
 			}
 		}
-	}
-
-//sql result
-	if (permission_exists('exec_sql')) {
-		echo "<span id='sql_response' style='display: none;'>";
-		echo "<b>".$text['label-results']."</b>\n";
-		echo "<br /><br />\n";
-		echo "<iframe name='iframe' id='iframe' style='width: calc(100% - 3px); height: 500px; background-color: #fff; border: 1px solid #c0c0c0;'></iframe>\n";
-		echo "</span>";
 	}
 
 //show the footer

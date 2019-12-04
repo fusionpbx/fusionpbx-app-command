@@ -1,7 +1,7 @@
 <?php
 
 	//application details
-		$apps[$x]['name'] = "Exec";
+		$apps[$x]['name'] = "Command";
 		$apps[$x]['uuid'] = "1dd98ca6-95f1-e728-7e8f-137fe18dc23c";
 		$apps[$x]['category'] = "System";
 		$apps[$x]['subcategory'] = "";
@@ -30,23 +30,18 @@
 
 	//permission details
 		$y=0;
-		$apps[$x]['permissions'][$y]['name'] = "exec_view";
+		$apps[$x]['permissions'][$y]['name'] = "command_view";
 		$apps[$x]['permissions'][$y]['menu']['uuid'] = "06493580-9131-ce57-23cd-d42d69dd8526";
 		$apps[$x]['permissions'][$y]['groups'][] = "superadmin";
 		$y++;
-		$apps[$x]['permissions'][$y]['name'] = "exec_command";
+		$apps[$x]['permissions'][$y]['name'] = "command_shell";
 		$apps[$x]['permissions'][$y]['groups'][] = "superadmin";
 		$y++;
-		$apps[$x]['permissions'][$y]['name'] = "exec_php";
+		$apps[$x]['permissions'][$y]['name'] = "command_php";
 		$apps[$x]['permissions'][$y]['groups'][] = "superadmin";
 		$y++;
-		$apps[$x]['permissions'][$y]['name'] = "exec_switch";
+		$apps[$x]['permissions'][$y]['name'] = "command_switch";
 		$apps[$x]['permissions'][$y]['groups'][] = "superadmin";
 		$y++;
-		$apps[$x]['permissions'][$y]['name'] = "exec_sql";
-		$apps[$x]['permissions'][$y]['groups'][] = "superadmin";
-		$y++;
-		//$apps[$x]['permissions'][$y]['name'] = "exec_sql_backup";
-		//$apps[$x]['permissions'][$y]['groups'][] = "superadmin";
 
 ?>
