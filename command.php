@@ -205,7 +205,7 @@
 	echo "<table cellpadding='0' cellspacing='0' border='0' width='100%'>";
 	echo "	<tr>";
 	echo "		<td valign='top' align='left' width='50%'>";
-	echo "			<b>".$text['label-command']."</b>\n";
+	echo "			<b>".$text['title-command']."</b>\n";
 	echo "		</td>";
 	echo "		<td valign='top' align='right' nowrap='nowrap'>";
 
