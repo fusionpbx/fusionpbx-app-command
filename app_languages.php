@@ -441,25 +441,25 @@ $text['description-php']['ru-ru'] = "Выполнение PHP команд. См
 $text['description-php']['sv-se'] = "Använd följande länk som en referens gällande PHP: <a href='http://php.net/manual/' target='_blank'>PHP Manual</a>";
 $text['description-php']['uk-ua'] = "Посилання на довідку PHP: <a href='http://php.net/manual/' target='_blank'>PHP Manual</a>";
 
-$text['description-execute']['en-us'] = "Provides a conventient way to execute system, PHP, switch and SQL commands.";
-$text['description-execute']['ar-eg'] = "";
-$text['description-execute']['de-at'] = "Bietet die Möglichkeit System, PHP, Switch und SQL Befehle auszuführen."; //copied from de-de
-$text['description-execute']['de-ch'] = "Bietet die Möglichkeit System, PHP, Switch und SQL Befehle auszuführen."; //copied from de-de
-$text['description-execute']['de-de'] = "Bietet die Möglichkeit System, PHP, Switch und SQL Befehle auszuführen.";
-$text['description-execute']['es-cl'] = "Provee un modo conveniente de ejecutar comandos de sistema, PHP o del switch.";
-$text['description-execute']['es-mx'] = "Provee un modo conveniente de ejecutar comandos de sistema, PHP o del switch."; //copied from es-cl
-$text['description-execute']['fr-ca'] = "Fournir un moyen pour executer des commandes système, PHP et switch. "; //copied from fr-fr
-$text['description-execute']['fr-fr'] = "Fournir un moyen pour executer des commandes système, PHP et switch. ";
-$text['description-execute']['he-il'] = "";
-$text['description-execute']['it-it'] = "Fornisce un facile sistema per eseguire i comandi di sistema, PHP, SQL e dello Switch.";
-$text['description-execute']['nl-nl'] = "Voorzie in een makkelijke manier om opdrachten uit te voeren voor: systeem, PHP, centrale en SQL";
-$text['description-execute']['pl-pl'] = "Ta funkcja zapewnia dogodny sposób wykonywania poleceń systemowych, PHP oraz switch.";
-$text['description-execute']['pt-br'] = "Utilize facilmente a execução de comandos do sistema, PHP e switch ";
-$text['description-execute']['pt-pt'] = "Oferece uma maneira fácil de executar comandos de sistema, PHP, e switch.";
-$text['description-execute']['ro-ro'] = "";
-$text['description-execute']['ru-ru'] = "Обеспечивает удобный способ выполнения команд системы, PHP, FreeSwitch и SQL.";
-$text['description-execute']['sv-se'] = "Erbjuder ett smidigt sätt att köra system, PHP och switch kommandon.";
-$text['description-execute']['uk-ua'] = "Забезпечує зручний спосіб виконати команди PHP, switch, а також системні команди";
+$text['description-command']['en-us'] = "Provides a conventient way to execute system, PHP, switch and SQL commands.";
+$text['description-command']['ar-eg'] = "";
+$text['description-command']['de-at'] = "Bietet die Möglichkeit System, PHP, Switch und SQL Befehle auszuführen."; //copied from de-de
+$text['description-command']['de-ch'] = "Bietet die Möglichkeit System, PHP, Switch und SQL Befehle auszuführen."; //copied from de-de
+$text['description-command']['de-de'] = "Bietet die Möglichkeit System, PHP, Switch und SQL Befehle auszuführen.";
+$text['description-command']['es-cl'] = "Provee un modo conveniente de ejecutar comandos de sistema, PHP o del switch.";
+$text['description-command']['es-mx'] = "Provee un modo conveniente de ejecutar comandos de sistema, PHP o del switch."; //copied from es-cl
+$text['description-command']['fr-ca'] = "Fournir un moyen pour executer des commandes système, PHP et switch. "; //copied from fr-fr
+$text['description-command']['fr-fr'] = "Fournir un moyen pour executer des commandes système, PHP et switch. ";
+$text['description-command']['he-il'] = "";
+$text['description-command']['it-it'] = "Fornisce un facile sistema per eseguire i comandi di sistema, PHP, SQL e dello Switch.";
+$text['description-command']['nl-nl'] = "Voorzie in een makkelijke manier om opdrachten uit te voeren voor: systeem, PHP, centrale en SQL";
+$text['description-command']['pl-pl'] = "Ta funkcja zapewnia dogodny sposób wykonywania poleceń systemowych, PHP oraz switch.";
+$text['description-command']['pt-br'] = "Utilize facilmente a execução de comandos do sistema, PHP e switch ";
+$text['description-command']['pt-pt'] = "Oferece uma maneira fácil de executar comandos de sistema, PHP, e switch.";
+$text['description-command']['ro-ro'] = "";
+$text['description-command']['ru-ru'] = "Обеспечивает удобный способ выполнения команд системы, PHP, FreeSwitch и SQL.";
+$text['description-command']['sv-se'] = "Erbjuder ett smidigt sätt att köra system, PHP och switch kommandon.";
+$text['description-command']['uk-ua'] = "Забезпечує зручний спосіб виконати команди PHP, switch, а також системні команди";
 
 $text['description-databases']['en-us'] = "Select the database to execute SQL query statements against.";
 $text['description-databases']['ar-eg'] = "";
