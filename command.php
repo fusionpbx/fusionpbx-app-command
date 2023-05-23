@@ -44,16 +44,16 @@
 	$text = $language->get();
 
 // load editor preferences/defaults
-	$setting_size = ($_SESSION["editor"]["font_size"]["text"] != '') ? $_SESSION["editor"]["font_size"]["text"] : '12px';
-	$setting_theme = ($_SESSION["editor"]["theme"]["text"] != '') ? $_SESSION["editor"]["theme"]["text"] : 'cobalt';
-	$setting_invisibles = ($_SESSION["editor"]["invisibles"]["boolean"] != '') ? $_SESSION["editor"]["invisibles"]["boolean"] : 'false';
-	$setting_indenting = ($_SESSION["editor"]["indent_guides"]["boolean"] != '') ? $_SESSION["editor"]["indent_guides"]["boolean"] : 'false';
-	$setting_numbering = ($_SESSION["editor"]["line_numbers"]["boolean"] != '') ? $_SESSION["editor"]["line_numbers"]["boolean"] : 'true';
+	$setting_size = !empty($_SESSION["editor"]["font_size"]["text"]) ? $_SESSION["editor"]["font_size"]["text"] : '12px';
+	$setting_theme = !empty($_SESSION["editor"]["theme"]["text"]) ? $_SESSION["editor"]["theme"]["text"] : 'cobalt';
+	$setting_invisibles = isset($_SESSION["editor"]["invisibles"]["boolean"]) && $_SESSION["editor"]["invisibles"]["boolean"] != '' ? $_SESSION["editor"]["invisibles"]["boolean"] : 'false';
+	$setting_indenting = isset($_SESSION["editor"]["indent_guides"]["boolean"]) && $_SESSION["editor"]["indent_guides"]["boolean"] != '' ? $_SESSION["editor"]["indent_guides"]["boolean"] : 'false';
+	$setting_numbering = isset($_SESSION["editor"]["line_numbers"]["boolean"]) && $_SESSION["editor"]["line_numbers"]["boolean"] != '' ? $_SESSION["editor"]["line_numbers"]["boolean"] : 'true';
 
 //get the html values and set them as variables
-	$handler = ($_REQUEST["handler"] != '') ? trim($_REQUEST["handler"]) : ((permission_exists('exec_switch')) ? 'switch' : null);
-	$code = trim($_POST["code"]);
-	$command = trim($_POST["command"]);
+	$handler = !empty($_REQUEST["handler"]) ? trim($_REQUEST["handler"]) : ((permission_exists('exec_switch')) ? 'switch' : null);
+	$code = trim($_POST["code"] ?? '');
+	$command = trim($_POST["command"] ?? '');
 
 //check the captcha
 	$command_authorized = false;
