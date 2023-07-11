@@ -237,7 +237,7 @@ permission_exists('command_shell')) {
 	echo "<br>";
 
 //html form
-	echo "<input type='hidden' name='id' value='".escape($_REQUEST['id'])."'>\n"; //sql db id
+	echo "<input type='hidden' name='id' value='".escape($_REQUEST['id'] ?? '')."'>\n"; //sql db id
 	echo "<textarea name='command' id='command' style='display: none;'></textarea>";
 	echo "<table cellpadding='0' cellspacing='0' border='0' style='width: 100%;'>\n";
 	echo "	<tr>";
@@ -258,7 +258,7 @@ permission_exists('command_shell')) {
 	?>
 	<table cellpadding='0' cellspacing='0' border='0' style='width: 100%;'>
 		<tr>
-			<td valign='middle' style='padding: 0 6px;' width='100%'><span id='description'><?php echo $text['description-'.$handler]; ?></span></td>
+			<td valign='middle' style='padding: 0 6px;' width='100%'><span id='description'><?php echo !empty($text['description-'.$handler]); ?></span></td>
 			<td valign='middle' style='padding: 0;'><img src='resources/images/blank.gif' style='width: 1px; height: 30px; border: none;'></td>
 			<td valign='middle' style='padding-left: 6px;'><img src='resources/images/icon_numbering.png' title='Toggle Line Numbers' class='control' onclick="toggle_option('numbering');"></td>
 			<td valign='middle' style='padding-left: 6px;'><img src='resources/images/icon_invisibles.png' title='Toggle Invisibles' class='control' onclick="toggle_option('invisibles');"></td>
