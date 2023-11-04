@@ -17,7 +17,7 @@
 
 	The Initial Developer of the Original Code is
 	Mark J Crane <markjcrane@fusionpbx.com>
-	Portions created by the Initial Developer are Copyright (C) 2008-2019
+	Portions created by the Initial Developer are Copyright (C) 2008-2023
 	the Initial Developer. All Rights Reserved.
 
 	Contributor(s):
@@ -42,7 +42,7 @@
 	$language = new text;
 	$text = $language->get();
 
-// load editor preferences/defaults
+//load editor preferences/defaults
 	$setting_size = !empty($_SESSION["editor"]["font_size"]["text"]) ? $_SESSION["editor"]["font_size"]["text"] : '12px';
 	$setting_theme = !empty($_SESSION["editor"]["theme"]["text"]) ? $_SESSION["editor"]["theme"]["text"] : 'cobalt';
 	$setting_invisibles = isset($_SESSION["editor"]["invisibles"]["boolean"]) && $_SESSION["editor"]["invisibles"]["boolean"] != '' ? $_SESSION["editor"]["invisibles"]["boolean"] : 'false';
@@ -50,15 +50,51 @@
 	$setting_numbering = isset($_SESSION["editor"]["line_numbers"]["boolean"]) && $_SESSION["editor"]["line_numbers"]["boolean"] != '' ? $_SESSION["editor"]["line_numbers"]["boolean"] : 'true';
 
 //get the html values and set them as variables
-	$handler = !empty($_REQUEST["handler"]) ? trim($_REQUEST["handler"]) : ((permission_exists('exec_switch')) ? 'switch' : null);
-	$code = trim($_POST["code"] ?? '');
-	$command = trim($_POST["command"] ?? '');
+	$handler = trim($_REQUEST["handler"] ?? '');
+	$code = trim($_REQUEST["code"] ?? '');
+	$command = trim($_REQUEST["command"] ?? '');
 
-//check the captcha
-	$command_authorized = false;
-	if (strlen($code) > 0) {
-		if (strtolower($_SESSION['captcha']) == strtolower($code)) {
+//run the command if the token is valid
+	if (!empty($_POST) && empty($_POST["persistformvar"])) {
+		//validate the token
+		$token = new token;
+		if ($token->validate($_SERVER['PHP_SELF'])) {
 			$command_authorized = true;
+		}
+		else {
+			message::add($text['message-invalid_token'],'negative');
+			$command_result = 'invalid token';
+			$command_authorized = false;
+		}
+
+		//run the command
+		if ($command_authorized) {
+			if (!empty($command)) {
+				$command_result = '';
+				switch ($handler) {
+					case 'shell':
+						if (permission_exists('command_shell')) {
+							$command_result = shell_exec($command . " 2>&1");
+						}
+						break;
+					case 'php':
+						if (permission_exists('command_php')) {
+							ob_start();
+							eval($command);
+							$command_result = ob_get_contents();
+							ob_end_clean();
+						}
+						break;
+					case 'switch':
+						if (permission_exists('command_switch')) {
+							$fp = event_socket_create($_SESSION['event_socket_ip_address'], $_SESSION['event_socket_port'], $_SESSION['event_socket_password']);
+							if ($fp) { 
+								$command_result = event_socket_request($fp, 'api '.$command);
+							}
+						}
+						break;
+				}
+			}
 		}
 	}
 
@@ -68,6 +104,10 @@
 		case 'sql': $mode = 'sql'; break;
 		default: $mode = 'text';
 	}
+
+//create token
+	$object = new token;
+	$token = $object->create($_SERVER['PHP_SELF']);
 
 //show the header
 	require_once "resources/header.php";
@@ -193,12 +233,6 @@
 
 <?php
 
-//generate the captcha image
-	$_SESSION['captcha'] = generate_password(7, 2);
-	$captcha = new captcha;
-	$captcha->code = $_SESSION['captcha'];
-	$image_base64 = $captcha->image_base64();
-
 //show the header
 	echo "<form method='post' name='frm' id='frm' action='exec.php' style='margin: 0;' onsubmit='return submit_check();'>\n";
 	echo "<table cellpadding='0' cellspacing='0' border='0' width='100%'>";
@@ -208,19 +242,11 @@
 	echo "		</td>";
 	echo "		<td valign='top' align='right' nowrap='nowrap'>";
 
-	//add the captcha
-	echo "				<img src=\"data:image/png;base64, ".$image_base64."\" /><input type='text' class='txt' style='width: 150px; margin-left: 15px;' name='code' id='code' value=''>\n";
-	echo "				&nbsp; &nbsp; &nbsp;\n";
-
-	if (permission_exists('command_switch') || permission_exists('command_php') || 
-permission_exists('command_shell')) {
+	if (permission_exists('command_switch') || permission_exists('command_php') || permission_exists('command_shell')) {
 		echo "				<select name='handler' id='handler' class='formfld' style='width:100px;' onchange=\"handler=this.value;set_handler(this.value);\">\n";
-		if (permission_exists('command_switch')) { echo "<option value='switch' ".(($handler == 
-'switch') ? "selected='selected'" : null).">".$text['label-switch']."</option>\n"; }
-		if (permission_exists('command_php')) { echo "<option value='php' ".(($handler == 'php') ? 
-"selected='selected'" : null).">".$text['label-php']."</option>\n"; }
-		if (permission_exists('command_shell')) { echo "<option value='shell' ".(($handler == 'shell') ? 
-"selected='selected'" : null).">".$text['label-shell']."</option>\n"; }
+		if (permission_exists('command_switch')) { echo "<option value='switch' ".(($handler == 'switch') ? "selected='selected'" : null).">".$text['label-switch']."</option>\n"; }
+		if (permission_exists('command_php')) { echo "<option value='php' ".(($handler == 'php') ? "selected='selected'" : null).">".$text['label-php']."</option>\n"; }
+		if (permission_exists('command_shell')) { echo "<option value='shell' ".(($handler == 'shell') ? "selected='selected'" : null).">".$text['label-shell']."</option>\n"; }
 		echo "				</select>\n";
 	}
 
@@ -354,6 +380,7 @@ permission_exists('command_shell')) {
 	echo "		</td>";
 	echo "	</tr>\n";
 	echo "</table>";
+	echo "<input type='hidden' name='" . $token['name'] . "' value='" . $token['hash'] . "'>\n";
 	echo "</form>";
 	echo "<br /><br />";
 	?>
@@ -395,40 +422,12 @@ permission_exists('command_shell')) {
 <?php
 
 //show the result
-	if (is_array($_POST)) {
-		if ($command != '') {
-			$result = '';
-			switch ($handler) {
-				case 'shell':
-					if (permission_exists('command_shell') && $command_authorized) {
-						$result = shell_exec($command . " 2>&1");
-					}
-					break;
-				case 'php':
-					if (permission_exists('command_php') && $command_authorized) {
-						ob_start();
-						eval($command);
-						$result = ob_get_contents();
-						ob_end_clean();
-					}
-					break;
-				case 'switch':
-					if (permission_exists('command_switch') && $command_authorized) {
-						$fp = event_socket_create($_SESSION['event_socket_ip_address'], $_SESSION['event_socket_port'], $_SESSION['event_socket_password']);
-						if ($fp) { 
-							$result = event_socket_request($fp, 'api '.$command);
-						}
-					}
-					break;
-			}
-			if ($result != '') {
-				echo "<span id='response'>";
-				echo "<b>".$text['label-response']."</b>\n";
-				echo "<br /><br />\n";
-				echo ($handler == 'switch') ? "<textarea style='width: 100%; height: 450px; font-family: monospace; padding: 15px;' wrap='off'>".$result."</textarea>\n" : "<pre>".escape($result)."</pre>";
-				echo "</span>";
-			}
-		}
+	if (!empty($command_result)) {
+		echo "<span id='response'>";
+		echo "<b>".$text['label-response']."</b>\n";
+		echo "<br /><br />\n";
+		echo ($handler == 'switch') ? "<textarea style='width: 100%; height: 450px; font-family: monospace; padding: 15px;' wrap='off'>".$command_result."</textarea>\n" : "<pre>".escape($command_result)."</pre>";
+		echo "</span>";
 	}
 
 //show the footer
