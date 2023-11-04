@@ -435,7 +435,7 @@ $text['header-databases']['ko-kr'] = "데이터베이스";
 
 $text['description-switch']['en-us'] = "Switch CLI. View valid commands with: 'help'.";
 $text['description-switch']['en-gb'] = "Switch CLI. View valid commands with: 'help'.";
-$text['description-switch']['ar-eg'] = "تبديل CLI. عرض الأوامر الصالحة باستخدام: "مساعدة".";
+$text['description-switch']['ar-eg'] = "تبديل CLI. عرض الأوامر الصالحة باستخدام: 'مساعدة'.";
 $text['description-switch']['de-at'] = "Um eine Liste der gültigen Befehle zu erhalten tippen Sie: 'help'"; //copied from de-de
 $text['description-switch']['de-ch'] = "Um eine Liste der gültigen Befehle zu erhalten tippen Sie: 'help'"; //copied from de-de
 $text['description-switch']['de-de'] = "Um eine Liste der gültigen Befehle zu erhalten tippen Sie: 'help'";
