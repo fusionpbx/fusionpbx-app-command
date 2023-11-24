@@ -374,7 +374,7 @@
 			</td>
 		</tr>
 	</table>
-	<div id='editor'><?php echo $command; ?></div>
+	<div id='editor' style="resize:vertical; overflow:auto;"><?php echo $command; ?></div>
 
 	<?php
 	echo "		</td>";
