@@ -250,24 +250,25 @@
 	echo "<br>";
 
 //html form
-	echo "<input type='hidden' name='id' value='".escape($_REQUEST['id'] ?? '')."'>\n"; //sql db id
-	echo "<textarea name='command' id='command' style='display: none;'></textarea>";
-	echo "<table cellpadding='0' cellspacing='0' border='0' style='width: 100%;'>\n";
-	echo "	<tr>";
-	echo "		<td style='width: 280px;' valign='top' nowrap>";
+	echo "<div class='card'>\n";
+	echo "	<input type='hidden' name='id' value='".escape($_REQUEST['id'] ?? '')."'>\n"; //sql db id
+	echo "	<textarea name='command' id='command' style='display: none;'></textarea>";
+	echo "	<table cellpadding='0' cellspacing='0' border='0' style='width: 100%;'>\n";
+	echo "		<tr>";
+	echo "			<td style='width: 280px;' valign='top' nowrap>";
 
-	echo "			<table cellpadding='0' cellspacing='0' border='0' width='100%' height='100%'>";
+	echo "				<table cellpadding='0' cellspacing='0' border='0' width='100%' height='100%'>";
 	if (permission_exists('edit_view') && file_exists($_SERVER["PROJECT_ROOT"]."/app/edit/")) {
-		echo "			<tr>";
-		echo "				<td valign='top' height='100%'>";
-		echo "					<iframe id='clip_list' src='".PROJECT_PATH."/app/edit/clip_list.php' style='border: none; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; height: calc(100% - 2px); width: calc(100% - 15px);'></iframe>\n";
-		echo "				</td>";
-		echo "			</tr>";
+		echo "				<tr>";
+		echo "					<td valign='top' height='100%'>";
+		echo "						<iframe id='clip_list' src='".PROJECT_PATH."/app/edit/clip_list.php' style='border: none; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; height: calc(100% - 2px); width: calc(100% - 15px);'></iframe>\n";
+		echo "					</td>";
+		echo "				</tr>";
 	}
-	echo "			</table>";
+	echo "				</table>";
 
-	echo "		</td>";
-	echo "		<td valign='top' style='height: 400px;'>"
+	echo "			</td>";
+	echo "			<td valign='top' style='height: 400px;'>"
 	?>
 	<table cellpadding='0' cellspacing='0' border='0' style='width: 100%;'>
 		<tr>
@@ -365,9 +366,10 @@
 	<div id='editor' style="resize:vertical; overflow:auto;"><?php echo $command; ?></div>
 
 	<?php
-	echo "		</td>";
-	echo "	</tr>\n";
-	echo "</table>";
+	echo "			</td>";
+	echo "		</tr>\n";
+	echo "	</table>";
+	echo "</div>\n";
 	echo "<input type='hidden' name='" . $token['name'] . "' value='" . $token['hash'] . "'>\n";
 	echo "</form>";
 	echo "<br /><br />";
