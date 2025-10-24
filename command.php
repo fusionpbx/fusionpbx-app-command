@@ -17,7 +17,7 @@
 
 	The Initial Developer of the Original Code is
 	Mark J Crane <markjcrane@fusionpbx.com>
-	Portions created by the Initial Developer are Copyright (C) 2008-2023
+	Portions created by the Initial Developer are Copyright (C) 2008-2025
 	the Initial Developer. All Rights Reserved.
 
 	Contributor(s):
@@ -43,11 +43,11 @@
 	$text = $language->get();
 
 //load editor preferences/defaults
-	$setting_size = !empty($_SESSION["editor"]["font_size"]["text"]) ? $_SESSION["editor"]["font_size"]["text"] : '12px';
-	$setting_theme = !empty($_SESSION["editor"]["theme"]["text"]) ? $_SESSION["editor"]["theme"]["text"] : 'cobalt';
-	$setting_invisibles = isset($_SESSION["editor"]["invisibles"]["boolean"]) && $_SESSION["editor"]["invisibles"]["boolean"] != '' ? $_SESSION["editor"]["invisibles"]["boolean"] : 'false';
-	$setting_indenting = isset($_SESSION["editor"]["indent_guides"]["boolean"]) && $_SESSION["editor"]["indent_guides"]["boolean"] != '' ? $_SESSION["editor"]["indent_guides"]["boolean"] : 'false';
-	$setting_numbering = isset($_SESSION["editor"]["line_numbers"]["boolean"]) && $_SESSION["editor"]["line_numbers"]["boolean"] != '' ? $_SESSION["editor"]["line_numbers"]["boolean"] : 'true';
+	$setting_size = $settings->get('editor','font_size','12px');
+	$setting_theme = $settings->get('editor','theme','cobalt');
+	$setting_invisibles = $settings->get('editor','invisibles',false);
+	$setting_indenting = $settings->get('editor','indent_guides',false);
+	$setting_numbering = $settings->get('editor','line_numbers',true);
 
 //get the html values and set them as variables
 	$handler = trim($_REQUEST["handler"] ?? '');
@@ -87,9 +87,9 @@
 						break;
 					case 'switch':
 						if (permission_exists('command_switch')) {
-							$fp = event_socket_create($_SESSION['event_socket_ip_address'], $_SESSION['event_socket_port'], $_SESSION['event_socket_password']);
-							if ($fp) { 
-								$command_result = event_socket_request($fp, 'api '.$command);
+							$esl = event_socket::create();
+							if ($esl->is_connected()) {
+								$command_result = event_socket::api(rtrim($command));
 							}
 						}
 						break;
@@ -101,7 +101,6 @@
 //set editor moder
 	switch ($handler) {
 		case 'php': $mode = 'php'; break;
-		case 'sql': $mode = 'sql'; break;
 		default: $mode = 'text';
 	}
 
@@ -118,17 +117,11 @@
 	<script language="JavaScript" type="text/javascript">
 		function submit_check() {
 			document.getElementById('command').value = editor.getSession().getValue();
-			if (document.getElementById('mode').value == 'sql') {
-				$('#frm').prop('target', 'iframe').prop('action', 'sql_query_result.php?code='+ document.getElementById('code').value);
-				$('#sql_response').show();
+			if (document.getElementById('command').value == '') {
+				focus_editor();
+				return false;
 			}
-			else {
-				if (document.getElementById('command').value == '') {
-					focus_editor();
-					return false;
-				}
-				$('#frm').prop('target', '').prop('action', '');
-			}
+			$('#frm').prop('target', '').prop('action', '');
 			return true;
 		}
 
@@ -158,18 +151,11 @@
 
 		function set_handler(handler) {
 			switch (handler) {
-				<?php if (permission_exists('exec_switch')) { ?>
+				<?php if (permission_exists('command_switch')) { ?>
 					case 'switch':
 						document.getElementById('description').innerHTML = "<?php echo $text['description-switch'];?>";
 						editor.getSession().setMode('ace/mode/text');
 						$('#mode option[value=text]').prop('selected',true);
-						<?php if (permission_exists('exec_sql')) { ?>
-							$('.sql_controls').hide();
-							document.getElementById('sql_type').selectedIndex = 0;
-							document.getElementById('table_name').selectedIndex = 0;
-							$('#iframe').prop('src','');
-							$('#sql_response').hide();
-						<?php } ?>
 						$('#response').show();
 						break;
 				<?php } ?>
@@ -178,13 +164,6 @@
 						document.getElementById('description').innerHTML = "<?php echo $text['description-php'];?>";
 						editor.getSession().setMode({path:'ace/mode/php', inline:true}); //highlight without opening tag
 						$('#mode option[value=php]').prop('selected',true);
-						<?php if (permission_exists('exec_sql')) { ?>
-							$('.sql_controls').hide();
-							document.getElementById('sql_type').selectedIndex = 0;
-							document.getElementById('table_name').selectedIndex = 0;
-							$('#iframe').prop('src','');
-							$('#sql_response').hide();
-						<?php } ?>
 						$('#response').show();
 						break;
 				<?php } ?>
@@ -251,7 +230,6 @@
 
 //html form
 	echo "<div class='card'>\n";
-	echo "	<input type='hidden' name='id' value='".escape($_REQUEST['id'] ?? '')."'>\n"; //sql db id
 	echo "	<textarea name='command' id='command' style='display: none;'></textarea>";
 	echo "	<table cellpadding='0' cellspacing='0' border='0' style='width: 100%;'>\n";
 	echo "		<tr>";
@@ -384,12 +362,12 @@
 				theme: 'ace/theme/'+document.getElementById('theme').options[document.getElementById('theme').selectedIndex].value,
 				selectionStyle: 'text',
 				cursorStyle: 'smooth',
-				showInvisibles: <?php echo $setting_invisibles;?>,
-				displayIndentGuides: <?php echo $setting_indenting;?>,
-				showLineNumbers: <?php echo $setting_numbering;?>,
+				showInvisibles: <?php echo $setting_invisibles ? 'true' : 'false';?>,
+				displayIndentGuides: <?php echo $setting_indenting ? 'true' : 'false';?>,
+				showLineNumbers: <?php echo $setting_numbering ? 'true' : 'false';?>,
 				showGutter: true,
 				scrollPastEnd: true,
-				fadeFoldWidgets: <?php echo $setting_numbering;?>,
+				fadeFoldWidgets: <?php echo $setting_numbering ? 'true' : 'false';?>,
 				showPrintMargin: false,
 				highlightGutterLine: false,
 				useSoftTabs: false
