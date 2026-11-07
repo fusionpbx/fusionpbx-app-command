@@ -246,7 +246,7 @@
 	echo "				</table>";
 
 	echo "			</td>";
-	echo "			<td valign='top' style='height: 400px;'>"
+	echo "			<td valign='top' style='height: 300px;'>"
 	?>
 	<table cellpadding='0' cellspacing='0' border='0' style='width: 100%;'>
 		<tr>
@@ -341,7 +341,7 @@
 			</td>
 		</tr>
 	</table>
-	<div id='editor' style="resize:vertical; overflow:auto;"><?php echo $command; ?></div>
+	<div id='editor' style="resize:vertical; overflow:auto;"><?php echo escape($command); ?></div>
 
 	<?php
 	echo "			</td>";
@@ -394,7 +394,7 @@
 		echo "<span id='response'>";
 		echo "<b>".$text['label-response']."</b>\n";
 		echo "<br /><br />\n";
-		echo ($handler == 'switch') ? "<textarea style='width: 100%; height: 450px; font-family: monospace; padding: 15px;' wrap='off'>".$command_result."</textarea>\n" : "<pre>".escape($command_result)."</pre>";
+		echo ($handler == 'switch') ? "<textarea style='width: 100%; height: 450px; font-family: monospace; padding: 15px;' wrap='off'>".escape($command_result)."</textarea>\n" : "<pre>".escape($command_result)."</pre>";
 		echo "</span>";
 	}
 
